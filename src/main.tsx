@@ -5,6 +5,7 @@ import { createBrowserHistory } from 'history';
 import { configureStore } from 'app/store';
 import { Router } from 'react-router';
 import { App } from './app';
+import './css/style.css';
 
 // prepare store
 const history = createBrowserHistory();
@@ -16,5 +17,5 @@ ReactDOM.render(
       <App />
     </Router>
   </Provider>,
-  document.getElementById('root')
+  document.getElementById('root'),
 );
