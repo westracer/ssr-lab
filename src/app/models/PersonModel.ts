@@ -1,8 +1,8 @@
 export interface PersonModel {
     id: number;
-    name: string;
-    title: string;
+    fio: string;
+    post: string;
     bio: string;
     interests: string;
-    imageUrl?: string;
+    image?: string;
 }

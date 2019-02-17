@@ -8,6 +8,14 @@ export interface Props {
 }
 
 export class DetailPage extends React.Component<Props> {
+    constructor(props: Props) {
+        super(props);
+
+        this.interestsDiv = React.createRef();
+    }
+
+    interestsDiv: React.RefObject<HTMLDivElement>;
+
     render() {
         const { person } = this.props;
 
@@ -19,17 +27,22 @@ export class DetailPage extends React.Component<Props> {
             <div className="container mb-2">
                 <div className="row mt-4">
                     <div className="col-md-3 m-1 d-flex">
-                        <img className="mr-3 img-fluid detail-pic" src={person.imageUrl ? person.imageUrl : getImgSrc('nophoto.jpeg')} alt="" />
+                        <img className="mr-3 img-fluid detail-pic" src={person.image ? person.image : getImgSrc('nophoto.jpeg')} alt="" />
                     </div>
                     <div className="col-md">
-                        <h5 className="mt-0 mb-1">{person.name}</h5>
-                        <i>{person.title}</i>
+                        <h5 contentEditable suppressContentEditableWarning className="mt-0 mb-1">{person.fio}</h5>
+                        <i>{person.post}</i>
                         {
                             !person.interests ?
                                 null :
                                 <>
                                     <br /><hr />Список научных интересов:
-                                    <div className={'mt-3 styled-list'} dangerouslySetInnerHTML={{__html: sanitizeHtml(person.interests)}} />
+                                    <div contentEditable suppressContentEditableWarning
+                                         className={'mt-3 styled-list'}
+                                         dangerouslySetInnerHTML={{__html: sanitizeHtml(person.interests)}}
+                                         ref={this.interestsDiv}
+                                         onBlur={event => console.log(this.interestsDiv.current !== null ? this.interestsDiv.current.innerHTML : null)}
+                                    />
                                 </>
                         }
                     </div>

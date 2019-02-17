@@ -13,15 +13,15 @@ export class PersonCard extends React.Component<Props> {
 
         return (
             <div className="card">
-                <img className="card-img-top card-photo" src={person.imageUrl ? person.imageUrl : getImgSrc('nophoto.jpeg')} alt="" />
+                <img className="card-img-top card-photo" src={person.image ? person.image : getImgSrc('nophoto.jpeg')} alt="" />
                 <div className="card-body">
                     <h5 className="card-title">
                         <NavLink className={'px-0'} to={`/detail/${person.id}`} activeClassName={'active'}>
-                            {person.name}
+                            {person.fio}
                         </NavLink>
                     </h5>
                     <p className="card-text">
-                        <i>{person.title}</i>
+                        <i>{person.post}</i>
                     </p>
                 </div>
             </div>
