@@ -9,3 +9,15 @@ export function omit<T extends object, K extends keyof T>(target: T, ...omitKeys
     {} as any
   );
 }
+
+export const getIconSrc = (iconName: string) => {
+    return `/assets/img/icons/${iconName}.svg`;
+};
+
+export const getImgSrc = (fileName: string) => {
+    return `/assets/img/${fileName}`;
+};
+
+export const getPicSrc = (fileName: string) => {
+    return `/assets/pic/${fileName}`;
+};

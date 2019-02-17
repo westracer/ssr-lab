@@ -1,10 +1,8 @@
-import { TodoModel } from 'app/models';
+import {PersonModel} from 'app/models/PersonModel';
 
 export interface RootState {
-  todos: RootState.TodoState;
+  persons: PersonsState;
   router?: any;
 }
 
-export namespace RootState {
-  export type TodoState = TodoModel[];
-}
+export type PersonsState = PersonModel[];

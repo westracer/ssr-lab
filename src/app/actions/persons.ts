@@ -1,7 +1,7 @@
 import { createAction } from 'redux-actions';
 import { TodoModel } from 'app/models';
 
-export namespace TodoActions {
+export namespace PersonsActions {
   export enum Type {
     ADD_TODO = 'ADD_TODO',
     EDIT_TODO = 'EDIT_TODO',
@@ -19,4 +19,4 @@ export namespace TodoActions {
   export const clearCompleted = createAction(Type.CLEAR_COMPLETED);
 }
 
-export type TodoActions = Omit<typeof TodoActions, 'Type'>;
+export type PersonsActions = Omit<typeof PersonsActions, 'Type'>;

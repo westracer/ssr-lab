@@ -53,11 +53,11 @@ module.exports = {
           {
             loader: 'css-loader',
             query: {
-              modules: true,
+              modules: false,
               sourceMap: !isProduction,
               importLoaders: 1,
               localIdentName: isProduction ? '[hash:base64:5]' : '[local]__[hash:base64:5]'
-            }
+            },
           },
           {
             loader: 'postcss-loader',

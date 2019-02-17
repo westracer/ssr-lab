@@ -66,12 +66,18 @@
     "webpack-dev-server": "^3.1.14"
   },
   "dependencies": {
+    "@types/react-router-dom": "^4.3.1",
+    "@types/sanitize-html": "^1.18.2",
+    "bootstrap": "^4.3.1",
     "classnames": "^2.2.6",
     "react": "^16.7.0",
+    "react-bootstrap": "^1.0.0-beta.5",
     "react-dom": "^16.7.0",
     "react-redux": "^6.0.0",
     "react-router": "^4.3.1",
+    "react-router-dom": "^4.3.1",
     "redux": "^4.0.1",
-    "redux-actions": "^2.6.4"
+    "redux-actions": "^2.6.4",
+    "sanitize-html": "^1.20.0"
   }
 }
