@@ -2,15 +2,16 @@ import axios, {AxiosInstance, AxiosPromise} from 'axios';
 import * as qs from 'qs';
 
 const ROUTES = {
-    person: '/person',
     personAdd: '/person/add',
     personGet: '/person/get',
     personRemove: '/person/remove',
     personUpdate: '/person/update',
-    personRemovePub: '/person/remove-pub',
     personAddPub: '/person/add-pub',
+    personRemovePub: '/person/remove-pub',
     publicationAdd: '/publication/add',
+    publicationGetAllTitles: '/publication/get-all-titles',
     publicationUpdate: '/publication/update',
+    publicationRemove:  '/publication/remove',
 };
 
 const API_URL = 'http://silexapi.local';
@@ -98,6 +99,24 @@ export default class Api {
 
         return Api.instance.post(ROUTES.publicationUpdate, {
             fields: fields
+        });
+    };
+
+    static publicationGetAllTitles = (ids: number[]): AxiosPromise => {
+        Api.checkInstance();
+
+        return Api.instance.get(ROUTES.publicationGetAllTitles, {
+            params: {
+                ids: ids
+            }
+        });
+    };
+
+    static publicationRemove = (id: number): AxiosPromise => {
+        Api.checkInstance();
+
+        return Api.instance.post(ROUTES.publicationRemove, {
+            id: id
         });
     };
 }

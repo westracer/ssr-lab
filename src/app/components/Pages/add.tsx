@@ -3,24 +3,26 @@ import {Button, Row, Col, InputGroup} from 'react-bootstrap/index';
 import {FormEvent} from 'react';
 import Api from 'app/utils/api';
 import {Alert} from 'react-bootstrap';
+import {PUBLICATION_ALL_FIELDS, PublicationModel} from 'app/models/PublicationModel';
 
 export interface Props {
 }
 
 export interface State {
     errorState?: JSX.Element;
+    publications: PublicationModel[];
 }
-
-const PUB_INPUT_NAMES = ['title', 'city', 'publisher', 'year', 'pages'];
 
 export class AddPage extends React.Component<Props, State> {
     public readonly state = {
         errorState: undefined,
+        publications: []
     };
 
     constructor(props: Props) {
         super(props);
 
+        // TODO: refactor to array of refs
         this.fileUpload = React.createRef();
         this.fileLabel = React.createRef();
         this.bioInput = React.createRef();
@@ -32,9 +34,11 @@ export class AddPage extends React.Component<Props, State> {
         this.pubForm = React.createRef();
 
         this.pubInputs = [];
-        for (let _ of PUB_INPUT_NAMES) {
+        for (let _ of PUBLICATION_ALL_FIELDS) {
             this.pubInputs.push(React.createRef());
         }
+
+        this.pubSelect = React.createRef();
     }
 
     personForm: React.RefObject<HTMLFormElement>;
@@ -49,6 +53,20 @@ export class AddPage extends React.Component<Props, State> {
     bioInput: React.RefObject<HTMLTextAreaElement>;
 
     pubInputs: React.RefObject<HTMLInputElement>[];
+
+    pubSelect: React.RefObject<HTMLSelectElement>;
+
+    componentDidMount() {
+        Api.publicationGetAllTitles([])
+            .then(({data}) => {
+                if (!data || !data.success) return;
+
+                this.setState({
+                    ...this.state,
+                    publications: data.publications as PublicationModel[]
+                });
+            });
+    }
 
     render() {
         const onFileChange = () => {
@@ -139,19 +157,40 @@ export class AddPage extends React.Component<Props, State> {
             }
         };
 
+        const onRemovePub = () => {
+            if (!this.pubSelect.current) return;
+            const selectVal = this.pubSelect.current.value;
+
+            if (selectVal === '') return;
+            const pubId = parseInt(selectVal, 10);
+
+            Api.publicationRemove(pubId)
+                .then(({data}) => {
+                    if (!data.success) {
+                        return;
+                    }
+
+                    const state = this.state;
+                    this.setState({
+                        ...state,
+                        publications: this.state.publications.filter((test: PublicationModel) => test.id !== pubId)
+                    });
+                });
+        };
+
         const onPubSubmit = (evt: FormEvent) =>  {
             evt.preventDefault();
 
             const PUB_ADD_MESSAGE = 'Неизвестная ошибка при добавлении публикации';
 
             let pub = {} as any;
-            for (let index in PUB_INPUT_NAMES) {
+            for (let index in PUBLICATION_ALL_FIELDS) {
                 const input = this.pubInputs[index].current;
                 if (!input) {
                     continue;
                 }
 
-                pub[PUB_INPUT_NAMES[index]] = input.value;
+                pub[PUBLICATION_ALL_FIELDS[index]] = input.value;
             }
 
             Api.publicationAdd(pub)
@@ -169,6 +208,31 @@ export class AddPage extends React.Component<Props, State> {
                     }
                 })
                 .catch(() => setAlert('danger', PUB_ADD_MESSAGE));
+        };
+
+        const renderPubSelect = () => {
+            if (!this.state.publications || this.state.publications.length === 0) {
+                return;
+            }
+
+            return (
+                <div className="row">
+                    <div className="col input-group">
+                        <div className={'col-sm mx-0 px-0 mb-3'}>
+                            <select ref={this.pubSelect} defaultValue={''} className="custom-select col-sm" id="inputGroupSelect01">
+                                <option value={''} disabled>Выберите публикацию</option>
+                                {this.state.publications.map((pub: PublicationModel) => <option key={pub.id} value={pub.id}>{pub.title}</option>)}
+                            </select>
+                        </div>
+                        {/*<div className={'col-sm mx-0 px-0 mb-3'}>*/}
+                        {/*<input type="text" className="form-control" placeholder={'Найти публикацию'} />*/}
+                        {/*</div>*/}
+                        <div className="input-group-append mb-3">
+                            <button onClick={onRemovePub} className="btn btn-outline-danger" type="button">Удалить</button>
+                        </div>
+                    </div>
+                </div>
+            );
         };
 
         return (
@@ -223,25 +287,25 @@ export class AddPage extends React.Component<Props, State> {
                 <form ref={this.pubForm} onSubmit={onPubSubmit}>
                     <Row>
                         <Col sm className={'mb-3'}>
-                            <input ref={this.pubInputs[PUB_INPUT_NAMES.indexOf('title')]} className={'form-control'}
+                            <input ref={this.pubInputs[PUBLICATION_ALL_FIELDS.indexOf('title')]} className={'form-control'}
                                    placeholder="Заголовок" />
                         </Col>
                         <Col md={'3'} className={'mb-3'}>
-                            <input ref={this.pubInputs[PUB_INPUT_NAMES.indexOf('city')]} className={'form-control'}
+                            <input ref={this.pubInputs[PUBLICATION_ALL_FIELDS.indexOf('city')]} className={'form-control'}
                                    placeholder="Город"/>
                         </Col>
                         <Col md={'3'} className={'mb-3'}>
-                            <input ref={this.pubInputs[PUB_INPUT_NAMES.indexOf('publisher')]} className={'form-control'}
+                            <input ref={this.pubInputs[PUBLICATION_ALL_FIELDS.indexOf('publisher')]} className={'form-control'}
                                    placeholder="Издатель"/>
                         </Col>
                     </Row>
                     <Row>
                         <Col sm className={'mb-3'}>
-                            <input ref={this.pubInputs[PUB_INPUT_NAMES.indexOf('year')]} className={'form-control'}
+                            <input ref={this.pubInputs[PUBLICATION_ALL_FIELDS.indexOf('year')]} className={'form-control'}
                                    type={'number'} min={'1900'} placeholder="Год"/>
                         </Col>
                         <Col sm className={'mb-3'}>
-                            <input ref={this.pubInputs[PUB_INPUT_NAMES.indexOf('pages')]} className={'form-control'}
+                            <input ref={this.pubInputs[PUBLICATION_ALL_FIELDS.indexOf('pages')]} className={'form-control'}
                                    type={'number'} min={'1'} placeholder="Кол-во страниц"/>
                         </Col>
                         <Col className={'mb-3 col-auto d-flex justify-content-end align-items-end'}>
@@ -251,6 +315,11 @@ export class AddPage extends React.Component<Props, State> {
                         </Col>
                     </Row>
                 </form>
+
+                <Row className="mt-2 py-2 px-3">
+                    <h5>Удалить публикацию</h5>
+                </Row>
+                {renderPubSelect()}
             </div>
         );
     }

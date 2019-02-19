@@ -45,7 +45,7 @@ export class Header extends React.Component<Props> {
                                 <NavLink to={'/list/'} exact activeClassName={'active'}>Сотрудники</NavLink> (<NavLink to={'/list/admin'} exact activeClassName={'active'}>админ</NavLink>)
                             </div>
                             <div className={'nav-link'}>
-                                <NavLink to={'/add'} activeClassName={'active'}>Добавление</NavLink>
+                                <NavLink to={'/admin'} activeClassName={'active'}>Администрирование</NavLink>
                             </div>
                         </Nav>
                         <Form inline>

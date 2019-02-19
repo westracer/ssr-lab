@@ -12,16 +12,9 @@ export const App = hot(module)(() => (
         <Header />
         <Switch>
             <Route path="/" component={IndexPage} exact={true} />
-            <Route path="/add" component={AddPage} />
+            <Route path="/admin" component={AddPage} />
             <Route path="/list/:admin?" component={ListPage} />
             <Route path="/detail/:id/:admin?" component={DetailPage} />
         </Switch>
-        {/*<Footer*/}
-            {/*filter={filter}*/}
-            {/*activeCount={activeCount}*/}
-            {/*completedCount={completedCount}*/}
-            {/*onClickClearCompleted={this.handleClearCompleted}*/}
-            {/*onClickFilter={this.handleFilterChange}*/}
-        {/*/>*/}
     </>
 ));
