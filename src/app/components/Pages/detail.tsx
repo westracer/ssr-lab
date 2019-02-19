@@ -2,7 +2,7 @@ import * as React from 'react';
 import {getImgSrc} from 'app/utils';
 import Api from 'app/utils/api';
 import {addPub, mapPersonPubsFromData, PERSON_ALL_FIELDS, PersonModel, removePub} from 'app/models/PersonModel';
-import {PublicationModel} from 'app/models/PublicationModel';
+import {PUBLICATION_ALL_FIELDS, PublicationModel} from 'app/models/PublicationModel';
 const sanitizeHtml = require('sanitize-html');
 
 export interface Props {
@@ -25,6 +25,11 @@ export class DetailPage extends React.Component<Props, State> {
             this.personDivs.push(React.createRef());
         }
 
+        this.pubSpans = [];
+        for (let _ of PUBLICATION_ALL_FIELDS) {
+            this.pubSpans.push(React.createRef());
+        }
+
         this.pubSelect = React.createRef();
 
         this.state = {
@@ -33,6 +38,7 @@ export class DetailPage extends React.Component<Props, State> {
         } as State;
     }
 
+    pubSpans: React.RefObject<HTMLSpanElement>[];
     personDivs: React.RefObject<HTMLDivElement>[];
     pubSelect: React.RefObject<HTMLSelectElement>;
 
@@ -117,6 +123,7 @@ export class DetailPage extends React.Component<Props, State> {
             let newInfo = {
                 id: person.id
             } as any;
+
             for (let index in PERSON_ALL_FIELDS) {
                 if (this.personDivs[index]) {
                     const div = this.personDivs[index].current;
@@ -132,6 +139,28 @@ export class DetailPage extends React.Component<Props, State> {
                 });
         };
 
+        const onEditPublication = (id: number, fieldName: string) => {
+            let value;
+            const index = PUBLICATION_ALL_FIELDS.indexOf(fieldName);
+
+            if (this.pubSpans[index]) {
+                const span = this.pubSpans[index].current;
+                if (!span) return;
+
+                value = span.innerText;
+            }
+
+            let newInfo = {
+                id: id,
+                [fieldName]: value
+            } as any;
+
+            Api.publicationUpdate(newInfo)
+                .then(({data}) => {
+                    if (!data || !data.success) return;
+                });
+        };
+
         const renderPublications = () => {
             if (person.publications !== undefined && person.publications.length > 0) {
                 const lis = person.publications.map((pub: PublicationModel | number) => {
@@ -141,12 +170,13 @@ export class DetailPage extends React.Component<Props, State> {
 
                     return (
                         <li key={pub.id} className={'mb-2'}>
-                            <span className={contentEditableClass} contentEditable={admin} suppressContentEditableWarning>{pub.title}</span>
+                            {/*rip codestyle*/}
+                            <span ref={this.pubSpans[PUBLICATION_ALL_FIELDS.indexOf('title')]} onBlur={() => onEditPublication(pub.id, 'title')} className={contentEditableClass} contentEditable={admin} suppressContentEditableWarning>{pub.title}</span>
                             <span> {pub.authors}</span> /
-                            <span className={contentEditableClass} contentEditable={admin} suppressContentEditableWarning> {pub.publisher}</span>,
-                            <span className={contentEditableClass} contentEditable={admin} suppressContentEditableWarning> {pub.city}</span>.
-                            <span className={contentEditableClass} contentEditable={admin} suppressContentEditableWarning> {pub.year}</span>. Стр.
-                            <span className={contentEditableClass} contentEditable={admin} suppressContentEditableWarning> {pub.pages}</span>.
+                            <span ref={this.pubSpans[PUBLICATION_ALL_FIELDS.indexOf('publisher')]} onBlur={() => onEditPublication(pub.id, 'publisher')} className={contentEditableClass} contentEditable={admin} suppressContentEditableWarning> {pub.publisher}</span>,
+                            <span ref={this.pubSpans[PUBLICATION_ALL_FIELDS.indexOf('city')]} onBlur={() => onEditPublication(pub.id, 'city')} className={contentEditableClass} contentEditable={admin} suppressContentEditableWarning> {pub.city}</span>.
+                            <span ref={this.pubSpans[PUBLICATION_ALL_FIELDS.indexOf('year')]} onBlur={() => onEditPublication(pub.id, 'year')} className={contentEditableClass} contentEditable={admin} suppressContentEditableWarning> {pub.year}</span>. Стр.
+                            <span ref={this.pubSpans[PUBLICATION_ALL_FIELDS.indexOf('pages')]} onBlur={() => onEditPublication(pub.id, 'pages')} className={contentEditableClass} contentEditable={admin} suppressContentEditableWarning> {pub.pages}</span>.
                             {
                                 admin ? <button data-pub={pub.id} onClick={onRemoveEmpPub}
                                                 type="button" className="btn btn-danger ml-2 py-0 px-2">x</button>

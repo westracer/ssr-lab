@@ -10,6 +10,7 @@ const ROUTES = {
     personRemovePub: '/person/remove-pub',
     personAddPub: '/person/add-pub',
     publicationAdd: '/publication/add',
+    publicationUpdate: '/publication/update',
 };
 
 const API_URL = 'http://silexapi.local';
@@ -88,6 +89,14 @@ export default class Api {
         Api.checkInstance();
 
         return Api.instance.post(ROUTES.personUpdate, {
+            fields: fields
+        });
+    };
+
+    static publicationUpdate = (fields: Object): AxiosPromise => {
+        Api.checkInstance();
+
+        return Api.instance.post(ROUTES.publicationUpdate, {
             fields: fields
         });
     };
