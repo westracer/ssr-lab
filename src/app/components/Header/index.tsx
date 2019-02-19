@@ -1,24 +1,14 @@
 import * as React from 'react';
-// import {TodoTextInput} from '../TodoTextInput';
-// import {PersonsActions} from 'app/actions/todos';
 import {Navbar, Nav, Form, FormControl, Button} from 'react-bootstrap/index';
 import {getIconSrc} from 'app/utils';
 import {NavLink} from 'react-router-dom';
 
 export interface Props {
-    // addTodo: typeof PersonsActions.addTodo;
 }
 
 export class Header extends React.Component<Props> {
     constructor(props: Props, context?: any) {
         super(props, context);
-        this.handleSave = this.handleSave.bind(this);
-    }
-
-    handleSave(text: string) {
-        if (text.length) {
-            // this.props.addTodo({text});
-        }
     }
 
     render() {
@@ -54,8 +44,6 @@ export class Header extends React.Component<Props> {
                         </Form>
                     </Navbar.Collapse>
                 </Navbar>
-                {/*<h1>Todos</h1>*/}
-                {/*<TodoTextInput newTodo onSave={this.handleSave} placeholder="What needs to be done?" />*/}
             </header>
         );
     }
