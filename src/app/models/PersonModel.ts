@@ -1,5 +1,7 @@
 import {PublicationModel} from 'app/models/PublicationModel';
 
+export const PERSON_ALL_FIELDS = ['fio', 'post', 'bio', 'interests'];
+
 export interface PersonModel {
     id: number;
     fio: string;

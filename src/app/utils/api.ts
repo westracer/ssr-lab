@@ -6,6 +6,7 @@ const ROUTES = {
     personAdd: '/person/add',
     personGet: '/person/get',
     personRemove: '/person/remove',
+    personUpdate: '/person/update',
     personRemovePub: '/person/remove-pub',
     personAddPub: '/person/add-pub',
     publicationAdd: '/publication/add',
@@ -57,7 +58,7 @@ export default class Api {
         });
     };
 
-    static empPubRemove = (pubId: number, personId: number): AxiosPromise => {
+    static personPubRemove = (pubId: number, personId: number): AxiosPromise => {
         Api.checkInstance();
 
         return Api.instance.post(ROUTES.personRemovePub, {
@@ -66,7 +67,7 @@ export default class Api {
         });
     };
 
-    static empRemove = (personId: number): AxiosPromise => {
+    static personRemove = (personId: number): AxiosPromise => {
         Api.checkInstance();
 
         return Api.instance.post(ROUTES.personRemove, {
@@ -80,6 +81,14 @@ export default class Api {
         return Api.instance.post(ROUTES.personAddPub, {
             pubId: pubId,
             personId: personId
+        });
+    };
+
+    static personUpdate = (fields: Object): AxiosPromise => {
+        Api.checkInstance();
+
+        return Api.instance.post(ROUTES.personUpdate, {
+            fields: fields
         });
     };
 }

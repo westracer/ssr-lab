@@ -17,7 +17,7 @@ export class PersonCard extends React.Component<Props> {
         const removePerson = () => {
             const id = person.id;
 
-            Api.empRemove(id)
+            Api.personRemove(id)
                 .then(({data}) => {
                     if (!data || !data.success) return;
 

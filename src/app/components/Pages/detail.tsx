@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {getImgSrc} from 'app/utils';
 import Api from 'app/utils/api';
-import {addPub, mapPersonPubsFromData, PersonModel, removePub} from 'app/models/PersonModel';
+import {addPub, mapPersonPubsFromData, PERSON_ALL_FIELDS, PersonModel, removePub} from 'app/models/PersonModel';
 import {PublicationModel} from 'app/models/PublicationModel';
 const sanitizeHtml = require('sanitize-html');
 
@@ -20,7 +20,11 @@ export class DetailPage extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        this.interestsDiv = React.createRef();
+        this.personDivs = [];
+        for (let _ of PERSON_ALL_FIELDS) {
+            this.personDivs.push(React.createRef());
+        }
+
         this.pubSelect = React.createRef();
 
         this.state = {
@@ -29,7 +33,12 @@ export class DetailPage extends React.Component<Props, State> {
         } as State;
     }
 
+    personDivs: React.RefObject<HTMLDivElement>[];
     pubSelect: React.RefObject<HTMLSelectElement>;
+
+    componentDidMount() {
+        this.fetchPerson();
+    }
 
     setFetchError = () => {
         this.setState({
@@ -57,12 +66,6 @@ export class DetailPage extends React.Component<Props, State> {
             });
     };
 
-    componentDidMount() {
-        this.fetchPerson();
-    }
-
-    interestsDiv: React.RefObject<HTMLDivElement>;
-
     render() {
         const { person, searchingText } = this.state;
         const admin = !!this.props.admin;
@@ -75,7 +78,7 @@ export class DetailPage extends React.Component<Props, State> {
         const onRemoveEmpPub = (evt: any) => {
             const pubId = parseInt(evt.target.dataset['pub'], 10);
 
-            Api.empPubRemove(pubId, person.id)
+            Api.personPubRemove(pubId, person.id)
                 .then(({data}) => {
                     if (!data.success) {
                         return;
@@ -107,6 +110,25 @@ export class DetailPage extends React.Component<Props, State> {
                         ...state,
                         person: addPub(person, data.pub as PublicationModel)
                     });
+                });
+        };
+
+        const onEditPerson = () => {
+            let newInfo = {
+                id: person.id
+            } as any;
+            for (let index in PERSON_ALL_FIELDS) {
+                if (this.personDivs[index]) {
+                    const div = this.personDivs[index].current;
+                    if (!div) return;
+
+                    newInfo[PERSON_ALL_FIELDS[index]] = div.innerText;
+                }
+            }
+
+            Api.personUpdate(newInfo)
+                .then(({data}) => {
+                    if (!data || !data.success) return;
                 });
         };
 
@@ -174,14 +196,18 @@ export class DetailPage extends React.Component<Props, State> {
         };
 
         return (
-            <div className="container mb-2">
+            <div className="person-details container mb-2">
                 <div className="row mt-4">
                     <div className="col-md-3 m-1 d-flex">
                         <img className="mr-3 img-fluid detail-pic" src={person.image ? person.image : getImgSrc('nophoto.jpeg')} alt="" />
                     </div>
                     <div className="col-md">
-                        <h5 contentEditable={admin} suppressContentEditableWarning className={`mt-0 mb-1 ${contentEditableClass}`}>{person.fio}</h5>
-                        <div className={contentEditableClass} contentEditable={admin} suppressContentEditableWarning><i>{person.post}</i></div>
+                        <div ref={this.personDivs[PERSON_ALL_FIELDS.indexOf('fio')]} contentEditable={admin} suppressContentEditableWarning className={`person-name mt-0 mb-1 ${contentEditableClass}`}>
+                            {person.fio}
+                        </div>
+                        <div ref={this.personDivs[PERSON_ALL_FIELDS.indexOf('post')]} className={contentEditableClass} contentEditable={admin} suppressContentEditableWarning>
+                            <i>{person.post}</i>
+                        </div>
                         {
                             !person.interests ?
                                 null :
@@ -190,8 +216,7 @@ export class DetailPage extends React.Component<Props, State> {
                                     <div contentEditable={admin} suppressContentEditableWarning
                                          className={`mt-3 styled-list ${contentEditableClass}`}
                                          dangerouslySetInnerHTML={{__html: sanitizeHtml(person.interests)}}
-                                         ref={this.interestsDiv}
-                                         onBlur={event => console.log(this.interestsDiv.current !== null ? this.interestsDiv.current.innerHTML : null)}
+                                         ref={this.personDivs[PERSON_ALL_FIELDS.indexOf('interests')]}
                                     />
                                 </>
                         }
@@ -199,9 +224,9 @@ export class DetailPage extends React.Component<Props, State> {
                 </div>
                 <div className="row mt-4">
                     <div className="col-md">
-                        <div contentEditable={admin} suppressContentEditableWarning className={`styled-list ${contentEditableClass}`} dangerouslySetInnerHTML={{__html: sanitizeHtml(person.bio)}} />
+                        <div ref={this.personDivs[PERSON_ALL_FIELDS.indexOf('bio')]} contentEditable={admin} suppressContentEditableWarning className={`styled-list ${contentEditableClass}`} dangerouslySetInnerHTML={{__html: sanitizeHtml(person.bio)}} />
                         <div className="row my-2 d-flex justify-content-end">
-                            {admin ? <button type="button" className="search-btn btn btn-primary">Сохранить</button> : null}
+                            {admin ? <button type="button" onClick={onEditPerson} className="search-btn btn btn-primary">Сохранить</button> : null}
                         </div>
                         {renderPublications()}
                     </div>
