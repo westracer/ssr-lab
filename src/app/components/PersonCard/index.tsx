@@ -5,11 +5,24 @@ import {NavLink} from 'react-router-dom';
 
 export interface Props {
     person: PersonModel;
+    admin?: string;
 }
 
 export class PersonCard extends React.Component<Props> {
     render() {
-        const { person } = this.props;
+        const { person, admin } = this.props;
+
+        const renderAdminLinks = () => {
+            if (!admin) {
+                return null;
+            }
+
+            return (
+                <div className="mb-2">
+                    <NavLink to={`/detail/${person.id}/admin`} exact>Редактировать</NavLink> <a href="javascript:void(0)">Удалить</a>
+                </div>
+            );
+        };
 
         return (
             <div className="card">
@@ -20,6 +33,7 @@ export class PersonCard extends React.Component<Props> {
                             {person.fio}
                         </NavLink>
                     </h5>
+                    {renderAdminLinks()}
                     <p className="card-text">
                         <i>{person.post}</i>
                     </p>

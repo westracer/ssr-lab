@@ -38,9 +38,15 @@ export class Header extends React.Component<Props> {
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse>
                         <Nav className="mr-auto">
-                            <NavLink className={'nav-link'} to={'/'} exact={true} activeClassName={'active'}>Главная</NavLink>
-                            <NavLink className={'nav-link'} to={'/list'} activeClassName={'active'}>Сотрудники</NavLink>
-                            <NavLink className={'nav-link'} to={'/add'} activeClassName={'active'}>Добавление</NavLink>
+                            <div className={'nav-link'}>
+                                <NavLink to={'/'} exact activeClassName={'active'}>Главная</NavLink>
+                            </div>
+                            <div className={'nav-link'}>
+                                <NavLink to={'/list/'} exact activeClassName={'active'}>Сотрудники</NavLink> (<NavLink to={'/list/admin'} exact activeClassName={'active'}>админ</NavLink>)
+                            </div>
+                            <div className={'nav-link'}>
+                                <NavLink to={'/add'} activeClassName={'active'}>Добавление</NavLink>
+                            </div>
                         </Nav>
                         <Form inline>
                             <FormControl type="text" placeholder="Введите ..." className="my-2 my-sm-0 mx-0 mr-sm-2" />

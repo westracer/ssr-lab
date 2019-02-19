@@ -6,32 +6,29 @@ import { DetailPage as DetailPageComponent } from 'app/components/Pages/detail';
 
 interface RouterProps {
     id: string;
+    admin?: string;
 }
 
 export interface Props extends RouteComponentProps<RouterProps> {
     id: string;
+    admin?: string;
 }
 
 @connect(
-    (state: RootState, ownProps: Props): Pick<Props, 'id'> => {
+    (state: RootState, ownProps: Props): Pick<Props, 'id' | 'admin'> => {
         return {
-            id: ownProps.match.params.id
+            id: ownProps.match.params.id,
+            admin: ownProps.match.params.admin
         };
     },
-    // (dispatch: Dispatch): Pick<Props, 'actions'> => ({
-    //     actions: bindActionCreators(omit(PersonsActions, 'Type'), dispatch)
-    // })
 )
 
 export class DetailPage extends React.Component<Props> {
     render() {
-        const { id } = this.props;
-        // const activeCount = todos.length - todos.filter((todo) => todo.completed).length;
-        // const filteredTodos = filter ? todos.filter(FILTER_FUNCTIONS[filter]) : todos;
-        // const completedCount: any = todos.reduce((count, todo) => (todo.completed ? count + 1 : count), 0);
+        const { id, admin } = this.props;
 
         return (
-            <DetailPageComponent id={id} />
+            <DetailPageComponent admin={admin} id={id} />
         );
     }
 }

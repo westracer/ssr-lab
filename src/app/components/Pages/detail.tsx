@@ -7,6 +7,7 @@ const sanitizeHtml = require('sanitize-html');
 
 export interface Props {
     id: string;
+    admin?: string;
 }
 
 export interface State {
@@ -64,6 +65,8 @@ export class DetailPage extends React.Component<Props, State> {
 
     render() {
         const { person, searchingText } = this.state;
+        const admin = !!this.props.admin;
+        const contentEditableClass = admin ? 'content-editable' : '';
 
         if (!person) {
             return <div className="container my-3">{searchingText}</div>;
@@ -116,14 +119,17 @@ export class DetailPage extends React.Component<Props, State> {
 
                     return (
                         <li key={pub.id} className={'mb-2'}>
-                            <span contentEditable suppressContentEditableWarning>{pub.title}</span>
+                            <span className={contentEditableClass} contentEditable={admin} suppressContentEditableWarning>{pub.title}</span>
                             <span> {pub.authors}</span> /
-                            <span contentEditable suppressContentEditableWarning> {pub.publisher}</span>,
-                            <span contentEditable suppressContentEditableWarning> {pub.city}</span>.
-                            <span contentEditable suppressContentEditableWarning> {pub.year}</span>. Стр.
-                            <span contentEditable suppressContentEditableWarning> {pub.pages}</span>.
-                            <button data-pub={pub.id} onClick={onRemoveEmpPub}
-                                    type="button" className="btn btn-danger ml-2 py-0 px-2">x</button>
+                            <span className={contentEditableClass} contentEditable={admin} suppressContentEditableWarning> {pub.publisher}</span>,
+                            <span className={contentEditableClass} contentEditable={admin} suppressContentEditableWarning> {pub.city}</span>.
+                            <span className={contentEditableClass} contentEditable={admin} suppressContentEditableWarning> {pub.year}</span>. Стр.
+                            <span className={contentEditableClass} contentEditable={admin} suppressContentEditableWarning> {pub.pages}</span>.
+                            {
+                                admin ? <button data-pub={pub.id} onClick={onRemoveEmpPub}
+                                                type="button" className="btn btn-danger ml-2 py-0 px-2">x</button>
+                                    : null
+                            }
                         </li>
                     );
                 });
@@ -143,7 +149,7 @@ export class DetailPage extends React.Component<Props, State> {
         };
 
         const renderPubSelect = () => {
-            if (!this.state.publications || this.state.publications.length === 0) {
+            if (!admin || !this.state.publications || this.state.publications.length === 0) {
                 return;
             }
 
@@ -174,15 +180,15 @@ export class DetailPage extends React.Component<Props, State> {
                         <img className="mr-3 img-fluid detail-pic" src={person.image ? person.image : getImgSrc('nophoto.jpeg')} alt="" />
                     </div>
                     <div className="col-md">
-                        <h5 contentEditable suppressContentEditableWarning className="mt-0 mb-1">{person.fio}</h5>
-                        <i>{person.post}</i>
+                        <h5 contentEditable={admin} suppressContentEditableWarning className={`mt-0 mb-1 ${contentEditableClass}`}>{person.fio}</h5>
+                        <div className={contentEditableClass} contentEditable={admin} suppressContentEditableWarning><i>{person.post}</i></div>
                         {
                             !person.interests ?
                                 null :
                                 <>
                                     <br /><hr />Список научных интересов:
-                                    <div contentEditable suppressContentEditableWarning
-                                         className={'mt-3 styled-list'}
+                                    <div contentEditable={admin} suppressContentEditableWarning
+                                         className={`mt-3 styled-list ${contentEditableClass}`}
                                          dangerouslySetInnerHTML={{__html: sanitizeHtml(person.interests)}}
                                          ref={this.interestsDiv}
                                          onBlur={event => console.log(this.interestsDiv.current !== null ? this.interestsDiv.current.innerHTML : null)}
@@ -193,9 +199,9 @@ export class DetailPage extends React.Component<Props, State> {
                 </div>
                 <div className="row mt-4">
                     <div className="col-md">
-                        <div className={'styled-list'} dangerouslySetInnerHTML={{__html: sanitizeHtml(person.bio)}} />
+                        <div contentEditable={admin} suppressContentEditableWarning className={`styled-list ${contentEditableClass}`} dangerouslySetInnerHTML={{__html: sanitizeHtml(person.bio)}} />
                         <div className="row my-2 d-flex justify-content-end">
-                            <button type="button" className="search-btn btn btn-primary">Сохранить</button>
+                            {admin ? <button type="button" className="search-btn btn btn-primary">Сохранить</button> : null}
                         </div>
                         {renderPublications()}
                     </div>

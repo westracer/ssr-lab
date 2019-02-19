@@ -13,8 +13,8 @@ export const App = hot(module)(() => (
         <Switch>
             <Route path="/" component={IndexPage} exact={true} />
             <Route path="/add" component={AddPage} />
-            <Route path="/list" component={ListPage} />
-            <Route path="/detail/:id" component={DetailPage} />
+            <Route path="/list/:admin?" component={ListPage} />
+            <Route path="/detail/:id/:admin?" component={DetailPage} />
         </Switch>
         {/*<Footer*/}
             {/*filter={filter}*/}

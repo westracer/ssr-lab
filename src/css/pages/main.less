@@ -51,6 +51,17 @@
         }
     }
 
+    .nav-link {
+        a {
+            color: var(--gray);
+
+            &.active {
+                color: var(--blue);
+                pointer-events: none;
+            }
+        }
+    }
+
     .search-btn {
         width: 100px;
     }
@@ -86,5 +97,12 @@
 }
 
 .detail-pic {
+    max-height: 350px;
     object-fit: cover;
+}
+
+.content-editable {
+    background: #f8f9fa;
+    border: 1px solid #d6d8db;
+    border-radius: 3px;
 }
