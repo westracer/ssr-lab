@@ -5,6 +5,8 @@ const ROUTES = {
     person: '/person',
     personAdd: '/person/add',
     personGet: '/person/get',
+    personRemovePub: '/person/remove-pub',
+    personAddPub: '/person/add-pub',
     publicationAdd: '/publication/add',
 };
 
@@ -51,6 +53,24 @@ export default class Api {
                 ids: ids,
                 noPubs: noPubs,
             }
+        });
+    };
+
+    static empPubRemove = (pubId: number, personId: number): AxiosPromise => {
+        Api.checkInstance();
+
+        return Api.instance.post(ROUTES.personRemovePub, {
+            pubId: pubId,
+            personId: personId
+        });
+    };
+
+    static empPubAdd = (pubId: number, personId: number): AxiosPromise => {
+        Api.checkInstance();
+
+        return Api.instance.post(ROUTES.personAddPub, {
+            pubId: pubId,
+            personId: personId
         });
     };
 }
