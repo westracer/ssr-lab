@@ -5,6 +5,7 @@ const ROUTES = {
     person: '/person',
     personAdd: '/person/add',
     personGet: '/person/get',
+    personRemove: '/person/remove',
     personRemovePub: '/person/remove-pub',
     personAddPub: '/person/add-pub',
     publicationAdd: '/publication/add',
@@ -62,6 +63,14 @@ export default class Api {
         return Api.instance.post(ROUTES.personRemovePub, {
             pubId: pubId,
             personId: personId
+        });
+    };
+
+    static empRemove = (personId: number): AxiosPromise => {
+        Api.checkInstance();
+
+        return Api.instance.post(ROUTES.personRemove, {
+            id: personId
         });
     };
 

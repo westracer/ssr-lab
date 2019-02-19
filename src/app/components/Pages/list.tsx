@@ -55,6 +55,18 @@ export class ListPage extends React.Component<Props, State> {
         const { admin } = this.props;
         const { personList, searchingText } = this.state;
 
+        const removePersonFromList = (id: number) => {
+            if (!this.state.personList) {
+                return
+            }
+
+            const newList = this.state.personList.filter((test) => test.id !== id);
+            this.setState({
+                ...this.state,
+                personList: newList
+            })
+        };
+
         if (!personList) {
             return <div className="container my-3">{searchingText}</div>;
         }
@@ -62,7 +74,12 @@ export class ListPage extends React.Component<Props, State> {
         return (
             <div className="container card-list">
                 <div className="card-columns mt-4">
-                    {personList.map((person: PersonModel, index: number) => <div key={index} className="col-sm"><PersonCard admin={admin} person={person} /></div>)}
+                    {personList.map((person: PersonModel, index: number) =>
+                        <div key={index} className="col-sm">
+                            {/*and that's why you use redux*/}
+                            <PersonCard removeCallback={removePersonFromList} admin={admin} person={person} />
+                        </div>)
+                    }
                 </div>
             </div>
         );

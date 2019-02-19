@@ -2,15 +2,28 @@ import * as React from 'react';
 import {getImgSrc} from 'app/utils';
 import {PersonModel} from 'app/models/PersonModel';
 import {NavLink} from 'react-router-dom';
+import Api from 'app/utils/api';
 
 export interface Props {
     person: PersonModel;
     admin?: string;
+    removeCallback: (id: number) => void;
 }
 
 export class PersonCard extends React.Component<Props> {
     render() {
-        const { person, admin } = this.props;
+        const { person, admin, removeCallback } = this.props;
+
+        const removePerson = () => {
+            const id = person.id;
+
+            Api.empRemove(id)
+                .then(({data}) => {
+                    if (!data || !data.success) return;
+
+                    removeCallback(id);
+                });
+        };
 
         const renderAdminLinks = () => {
             if (!admin) {
@@ -19,7 +32,7 @@ export class PersonCard extends React.Component<Props> {
 
             return (
                 <div className="mb-2">
-                    <NavLink to={`/detail/${person.id}/admin`} exact>Редактировать</NavLink> <a href="javascript:void(0)">Удалить</a>
+                    <NavLink to={`/detail/${person.id}/admin`} exact>Редактировать</NavLink> <a href="javascript:void(0)" onClick={removePerson}>Удалить</a>
                 </div>
             );
         };
