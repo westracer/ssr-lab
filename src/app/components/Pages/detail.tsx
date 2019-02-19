@@ -1,27 +1,110 @@
 import * as React from 'react';
-import {PersonModel} from 'app/models/PersonModel';
 import {getImgSrc} from 'app/utils';
+import Api from 'app/utils/api';
+import {PersonModel} from 'app/models/PersonModel';
+import {PublicationModel} from 'app/models/PublicationModel';
 const sanitizeHtml = require('sanitize-html');
 
 export interface Props {
-    person?: PersonModel;
+    id: string;
 }
 
-export class DetailPage extends React.Component<Props> {
+export interface State {
+    person?: PersonModel;
+    searchingText: string;
+}
+
+export class DetailPage extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
         this.interestsDiv = React.createRef();
+
+        this.state = {
+            searchingText: 'Получаем данные о сотруднике'
+        } as State;
+    }
+
+    setFetchError = () => {
+        this.setState({
+            ...this.state,
+            searchingText: 'Не удалось получить информацию'
+        });
+    };
+
+    componentDidMount() {
+        Api.personGet(false, [this.props.id])
+            .then(({data}) => {
+                if (!data.success || data.persons.length === 0) {
+                    this.setFetchError();
+                    return;
+                }
+
+                // TODO: move it to models
+                let person = data.persons[0] as PersonModel;
+                if (person.publications !== undefined) {
+                    let pubs = person.publications.map((pub: any) => {
+                        if (person.publications
+                            && typeof pub === 'number'
+                            && data.publications.hasOwnProperty(pub)
+                        ) {
+                            return data.publications[pub] as PublicationModel;
+                        } else {
+                            return -1;
+                        }
+                    });
+
+                    person.publications = pubs.filter((test) => test !== -1);
+                }
+
+                this.setState({
+                    ...this.state,
+                    person: person
+                });
+            })
+            .catch(() => {
+                this.setFetchError();
+            });
     }
 
     interestsDiv: React.RefObject<HTMLDivElement>;
 
     render() {
-        const { person } = this.props;
+        const { person, searchingText } = this.state;
 
         if (!person) {
-            return null;
+            return <div className="container my-3">{searchingText}</div>;
         }
+
+        const renderPublications = () => {
+            if (person.publications !== undefined && person.publications.length > 0) {
+                // TODO: move it to models
+                const lis = person.publications.map((pub: PublicationModel | number) => {
+                    if (typeof pub === 'number') {
+                        return -1;
+                    }
+
+                    return (
+                        <li key={pub.id} className={'mb-2'}>
+                            {`${pub.authors} ${pub.title} / ${pub.publisher}, ${pub.city}. ${pub.year}. С. ${pub.pages}`}
+                            <button type="button" className="btn btn-danger ml-2 py-0 px-2">x</button>
+                        </li>
+                    );
+                });
+
+                return (
+                    <>
+                        <hr />
+                        Список публикаций: <br />
+                        <ul>
+                            {lis}
+                        </ul>
+                    </>
+                );
+            } else {
+                return null;
+            }
+        };
 
         return (
             <div className="container mb-2">
@@ -50,64 +133,7 @@ export class DetailPage extends React.Component<Props> {
                 <div className="row mt-4">
                     <div className="col-md">
                         <div className={'styled-list'} dangerouslySetInnerHTML={{__html: sanitizeHtml(person.bio)}} />
-                        <hr />
-                        Список публикаций: <br />
-                        <ul>
-                            <li className={'mb-2'}>
-                                Тихонов А. В., Маркин В. В.
-                                Атлас модернизации России и ее регионов: социоэкономические
-                                и социокультурные тенденции и проблемы. Колл. научный труд /
-                                Сост. и отв. ред. член-корр. РАН Н.И. Лапин. Центр изучения
-                                социокультурных изменений. Институт философии РАН. М., 2016.
-                                Рец. А.В. Тихонов, В.В. Маркин // Социологические
-                                исследования. 2017. № 7, C. 170-172
-                                <button type="button"
-                                        className="btn btn-danger ml-2 py-0 px-2">x</button>
-                            </li>
-                            <li>
-                                Тихонов А. В., Богданов В. С., Гусейнова К. Э.
-                                Гражданская онлайн-экспертиза деятельности региональных
-                                систем управления в контексте процессов социокультурной
-                                модернизации регионов [Текст] / А.В. Тихонов, В.С. Богданов,
-                                К.Э. Гусейнова // Экономические и социальные перемены:
-                                факты, тенденции, прогноз. – 2017. – № 1. – C. 101-123. –
-                                DOI: 10.15838/esc.2017.1.49.6
-                                <button type="button"
-                                        className="btn btn-danger py-0 px-2">x</button>
-                            </li>
-                            <li>
-                                Тихонов А. В., Рабинович Е. И., Гусейнова К. Э.
-                                Дополнительные показатели процесса модернизации и
-                                региональных различий: информационная карта регионов //
-                                Россия: реформирование властно-управленческой вертикали в
-                                контексте проблем социокультурной модернизации регионов
-                                [монография] / [А. В. Тихонов и др.]; отв. ред. А. В.
-                                Тихонов. — Москва : ФНИСЦ РАН, 2017. С. 41-47.
-                                <button type="button"
-                                        className="btn btn-danger py-0 px-2">x</button>
-                            </li>
-                            <li>
-                                Тихонов А. В.
-                                Заключение // Россия: реформирование властно-управленческой
-                                вертикали в контексте проблем социокультурной модернизации
-                                регионов [монография] / [А. В. Тихонов и др.]; отв. ред. А.
-                                В. Тихонов. — Москва : ФНИСЦ РАН, 2017. С. 333-347.
-                                <button type="button"
-                                        className="btn btn-danger py-0 px-2">x</button>
-                            </li>
-                            <li>
-                                Тихонов А. В.
-                                Исследование отношения населения регионов с разным уровнем
-                                социокультурной модернизации к условиям жизни и к работе
-                                властно-управленческой вертикали: элементы программы //
-                                Россия: реформирование властно-управленческой вертикали в
-                                контексте проблем социокультурной модернизации регионов
-                                [монография] / [А. В. Тихонов и др.]; отв. ред. А. В.
-                                Тихонов. — Москва : ФНИСЦ РАН, 2017. С. 48-60.
-                                <button type="button"
-                                        className="btn btn-danger py-0 px-2">x</button>
-                            </li>
-                        </ul>
+                        {renderPublications()}
                     </div>
                 </div>
                 <div className="row mt-1 mx-1">

@@ -3,7 +3,9 @@ import * as qs from 'qs';
 
 const ROUTES = {
     person: '/person',
-    personAdd: '/person/add'
+    personAdd: '/person/add',
+    personGet: '/person/get',
+    publicationAdd: '/publication/add',
 };
 
 const API_URL = 'http://silexapi.local';
@@ -31,5 +33,24 @@ export default class Api {
         return Api.instance.post(ROUTES.personAdd, {
             person: person
         });
-    }
+    };
+
+    static publicationAdd = (publication: Object): AxiosPromise => {
+        Api.checkInstance();
+
+        return Api.instance.post(ROUTES.publicationAdd, {
+            publication: publication
+        });
+    };
+
+    static personGet = (noPubs: boolean = false, ids?: string[]): AxiosPromise => {
+        Api.checkInstance();
+
+        return Api.instance.get(ROUTES.personGet, {
+            params: {
+                ids: ids,
+                noPubs: noPubs,
+            }
+        });
+    };
 }

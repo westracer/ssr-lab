@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Form, FormControl, Button, Row, Col, InputGroup} from 'react-bootstrap/index';
+import {Button, Row, Col, InputGroup} from 'react-bootstrap/index';
 import {FormEvent} from 'react';
 import Api from 'app/utils/api';
 import {Alert} from 'react-bootstrap';
@@ -8,12 +8,14 @@ export interface Props {
 }
 
 export interface State {
-    personState?: JSX.Element;
+    errorState?: JSX.Element;
 }
+
+const PUB_INPUT_NAMES = ['title', 'city', 'publisher', 'year', 'pages'];
 
 export class AddPage extends React.Component<Props, State> {
     public readonly state = {
-        personState: undefined,
+        errorState: undefined,
     };
 
     constructor(props: Props) {
@@ -25,10 +27,19 @@ export class AddPage extends React.Component<Props, State> {
         this.fioInput = React.createRef();
         this.interestsInput = React.createRef();
         this.postInput = React.createRef();
+
         this.personForm = React.createRef();
+        this.pubForm = React.createRef();
+
+        this.pubInputs = [];
+        for (let _ of PUB_INPUT_NAMES) {
+            this.pubInputs.push(React.createRef());
+        }
     }
 
     personForm: React.RefObject<HTMLFormElement>;
+    pubForm: React.RefObject<HTMLFormElement>;
+
     fileUpload: React.RefObject<HTMLInputElement>;
     fileLabel: React.RefObject<HTMLLabelElement>;
 
@@ -36,6 +47,8 @@ export class AddPage extends React.Component<Props, State> {
     postInput: React.RefObject<HTMLInputElement>;
     interestsInput: React.RefObject<HTMLTextAreaElement>;
     bioInput: React.RefObject<HTMLTextAreaElement>;
+
+    pubInputs: React.RefObject<HTMLInputElement>[];
 
     render() {
         const onFileChange = () => {
@@ -69,7 +82,7 @@ export class AddPage extends React.Component<Props, State> {
         const setAlert = (variant: "danger" | "success", message: string) => {
             this.setState({
                 ...this.state,
-                personState: <Alert variant={variant}>{message}</Alert>
+                errorState: <Alert variant={variant}>{message}</Alert>
             } as State);
         };
 
@@ -126,10 +139,42 @@ export class AddPage extends React.Component<Props, State> {
             }
         };
 
+        const onPubSubmit = (evt: FormEvent) =>  {
+            evt.preventDefault();
+
+            const PUB_ADD_MESSAGE = 'Неизвестная ошибка при добавлении публикации';
+
+            let pub = {} as any;
+            for (let index in PUB_INPUT_NAMES) {
+                const input = this.pubInputs[index].current;
+                if (!input) {
+                    continue;
+                }
+
+                pub[PUB_INPUT_NAMES[index]] = input.value;
+            }
+
+            Api.publicationAdd(pub)
+                .then(({data}: any) => {
+                    if (data.success) {
+                        setAlert('success', 'Публикация успешно добавлена');
+
+                        if (this.pubForm.current) {
+                            this.pubForm.current.reset();
+                        }
+                    } else {
+                        let error = data.errorMessage ? data.errorMessage : PUB_ADD_MESSAGE;
+
+                        setAlert('danger', error);
+                    }
+                })
+                .catch(() => setAlert('danger', PUB_ADD_MESSAGE));
+        };
+
         return (
             <div className="container">
                 <div className={'mt-4 mb-2'}>
-                    {this.state.personState}
+                    {this.state.errorState}
                 </div>
                 <Row className="mt-2 py-2 px-3">
                     <h5>Добавить сотрудника</h5>
@@ -175,32 +220,37 @@ export class AddPage extends React.Component<Props, State> {
                 <Row className="mt-2 py-2 px-3">
                     <h5>Добавить публикацию</h5>
                 </Row>
-                <Form>
+                <form ref={this.pubForm} onSubmit={onPubSubmit}>
                     <Row>
                         <Col sm className={'mb-3'}>
-                            <FormControl placeholder="Заголовок" />
+                            <input ref={this.pubInputs[PUB_INPUT_NAMES.indexOf('title')]} className={'form-control'}
+                                   placeholder="Заголовок" />
                         </Col>
                         <Col md={'3'} className={'mb-3'}>
-                            <FormControl placeholder="Город"/>
+                            <input ref={this.pubInputs[PUB_INPUT_NAMES.indexOf('city')]} className={'form-control'}
+                                   placeholder="Город"/>
                         </Col>
                         <Col md={'3'} className={'mb-3'}>
-                            <FormControl placeholder="Издатель"/>
+                            <input ref={this.pubInputs[PUB_INPUT_NAMES.indexOf('publisher')]} className={'form-control'}
+                                   placeholder="Издатель"/>
                         </Col>
                     </Row>
                     <Row>
                         <Col sm className={'mb-3'}>
-                            <FormControl type={'number'} min={'1900'} placeholder="Год"/>
+                            <input ref={this.pubInputs[PUB_INPUT_NAMES.indexOf('year')]} className={'form-control'}
+                                   type={'number'} min={'1900'} placeholder="Год"/>
                         </Col>
                         <Col sm className={'mb-3'}>
-                            <FormControl type={'number'} min={'1'} placeholder="Кол-во страниц"/>
+                            <input ref={this.pubInputs[PUB_INPUT_NAMES.indexOf('pages')]} className={'form-control'}
+                                   type={'number'} min={'1'} placeholder="Кол-во страниц"/>
                         </Col>
                         <Col className={'mb-3 col-auto d-flex justify-content-end align-items-end'}>
-                            <Button type="button" className="btn btn-primary">
+                            <Button type="submit" className="btn btn-primary">
                                 Добавить
                             </Button>
                         </Col>
                     </Row>
-                </Form>
+                </form>
             </div>
         );
     }

@@ -1,3 +1,5 @@
+import {PublicationModel} from 'app/models/PublicationModel';
+
 export interface PersonModel {
     id: number;
     fio: string;
@@ -5,4 +7,5 @@ export interface PersonModel {
     bio: string;
     interests: string;
     image?: string;
+    publications?: (PublicationModel | number)[];
 }
