@@ -14,7 +14,11 @@ const ROUTES = {
     publicationRemove:  '/publication/remove',
 };
 
-const API_URL = 'http://silexapi.local';
+// silex
+// const API_URL = 'http://silexapi.local';
+
+// spring, node
+const API_URL = 'http://localhost:8080';
 
 export default class Api {
     private static instance: AxiosInstance;

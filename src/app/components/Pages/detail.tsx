@@ -63,8 +63,8 @@ export class DetailPage extends React.Component<Props, State> {
 
                 this.setState({
                     ...this.state,
-                    person: mapPersonPubsFromData(data),
-                    publications: Object.values(data.publications) as PublicationModel[]
+                    person: mapPersonPubsFromData(parseInt(this.props.id, 10), data),
+                    publications: data.publications ? Object.values(data.publications) as PublicationModel[] : []
                 });
             })
             .catch(() => {

@@ -34,8 +34,10 @@ export const removePub = (person: PersonModel, pubId: number) => {
     return person;
 };
 
-export const mapPersonPubsFromData = (data: any) => {
-    let person = data.persons[0] as PersonModel;
+export const mapPersonPubsFromData = (id: number, data: any) => {
+    const persons = data.persons as PersonModel[];
+
+    let person = persons.find((test) => test.id === id) as PersonModel;
     if (person.publications !== undefined) {
         let pubs = person.publications.map((pub: any) => {
             if (person.publications
